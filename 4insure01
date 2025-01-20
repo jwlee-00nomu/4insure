@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4대보험 계산기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        label, input, select, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>4대보험 계산기</h1>
+    <form>
+        <label for="salaryInput">월급여(세전 금액):</label>
+        <input type="number" id="salaryInput" placeholder="금액을 입력하세요" required>
+
+        <label for="dependentsInput">부양가족 수:</label>
+        <select id="dependentsInput">
+            <option value="0">0명</option>
+            <option value="1">1명</option>
+            <option value="2">2명</option>
+            <option value="3">3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명 이상</option>
+        </select>
+
+        <label for="yearInput">산정 기준 연도:</label>
+        <select id="yearInput">
+            <option value="2023">2023년</option>
+            <option value="2024">2024년</option>
+            <option value="2025">2025년</option>
+        </select>
+
+        <button type="button" id="calculateButton">계산하기</button>
+    </form>
+
+    <h2>결과</h2>
+    <p id="resultOutput"></p>
+
+    <script>
+        document.getElementById('calculateButton').addEventListener('click', function () {
+            const salary = parseFloat(document.getElementById('salaryInput').value);
+            const dependents = parseInt(document.getElementById('dependentsInput').value, 10);
+            const year = document.getElementById('yearInput').value;
+            const resultElement = document.getElementById('resultOutput');
+
+            if (isNaN(salary) || salary <= 0) {
+                resultElement.innerHTML = "<strong style='color: red;'>올바른 급여를 입력해주세요.</strong>";
+                return;
+            }
+
+            let 국민연금율 = 0.045;
+            let 건강보험율 = 0.035;
+            let 장기요양율 = 0.1227;
+            let 고용보험율 = 0.009;
+
+            if (year === "2024") {
+                국민연금율 = 0.046;
+                건강보험율 = 0.036;
+            } else if (year === "2025") {
+                국민연금율 = 0.047;
+                건강보험율 = 0.037;
+            }
+
+            const 국민연금 = salary * 국민연금율;
+            const 건강보험 = salary * 건강보험율;
+            const 장기요양보험 = 건강보험 * 장기요양율;
+            const 고용보험 = salary * 고용보험율;
+
+            const 가족공제 = dependents * 10000;
+
+            const 총액 = 국민연금 + 건강보험 + 장기요양보험 + 고용보험 - 가족공제;
+
+            resultElement.innerHTML = `
+                <strong>계산 결과 (${year}년 기준):</strong><br>
+                국민연금: ${국민연금.toFixed(2)} 원<br>
+                건강보험: ${건강보험.toFixed(2)} 원<br>
+                장기요양보험: ${장기요양보험.toFixed(2)} 원<br>
+                고용보험: ${고용보험.toFixed(2)} 원<br>
+                부양가족 공제: -${가족공제.toFixed(2)} 원<br>
+                <strong>총액:</strong> ${총액.toFixed(2)} 원
+            `;
+        });
+    </script>
+</body>
+</html>
